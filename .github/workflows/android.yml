@@ -165,10 +165,11 @@ jobs:
           echo "::group::Gradle output (tail)"
           tail -n 120 gradle.log || true
           echo "::endgroup::"
-          grep -nE "FAILURE:|What went wrong|Caused by|error:|Execution failed|> " gradle.log \
-            | head -n 25 | while IFS= read -r line; do
-              echo "::error title=Gradle::${line}"
-            done || true
+          # Gradle prints its diagnosis in a FAILURE: block at the very end;
+          # a broad grep just matches every task line and buries it.
+          sed -n '/^FAILURE:/,$p' gradle.log | head -n 40 | while IFS= read -r line; do
+            [ -n "$line" ] && echo "::error title=Gradle::${line}"
+          done || true
 
       - name: Build debug APK (no signing secrets configured)
         if: ${{ steps.signing.outputs.available != 'true' }}
