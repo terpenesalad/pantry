@@ -138,6 +138,7 @@ jobs:
           echo "Keystore decoded ($(stat -c%s android/app/release.keystore) bytes)"
 
       - name: Build signed release APK
+        id: relbuild
         if: ${{ steps.signing.outputs.available == 'true' }}
         env:
           KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -146,12 +147,28 @@ jobs:
         shell: bash
         working-directory: android
         run: |
-          set -euo pipefail
-          ./gradlew --no-daemon assembleRelease \
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace assembleRelease \
             -Pandroid.injected.signing.store.file="$PWD/app/release.keystore" \
             -Pandroid.injected.signing.store.password="$KS_PASSWORD" \
             -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD" 2>&1 | tee ../gradle.log
+          exit "${PIPESTATUS[0]}"
+
+      # Gradle's failure text is buried in the raw job log, which is awkward to
+      # reach. Surface the useful lines as annotations so a failure is readable
+      # from the run summary.
+      - name: Surface Gradle failure
+        if: ${{ failure() && steps.relbuild.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::group::Gradle output (tail)"
+          tail -n 120 gradle.log || true
+          echo "::endgroup::"
+          grep -nE "FAILURE:|What went wrong|Caused by|error:|Execution failed|> " gradle.log \
+            | head -n 25 | while IFS= read -r line; do
+              echo "::error title=Gradle::${line}"
+            done || true
 
       - name: Build debug APK (no signing secrets configured)
         if: ${{ steps.signing.outputs.available != 'true' }}
