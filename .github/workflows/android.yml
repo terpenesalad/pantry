@@ -129,7 +129,7 @@ jobs:
             echo "No ANDROID_KEYSTORE_BASE64 secret set."
             exit 0
           fi
-          echo "$KEYSTORE_B64" | base64 -d > android/app/release.keystore
+          printf '%s' "$KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > android/app/release.keystore
           if [[ ! -s android/app/release.keystore ]]; then
             echo "The keystore secret did not decode to a usable file." >&2
             exit 1
@@ -148,6 +148,12 @@ jobs:
         working-directory: android
         run: |
           set -o pipefail
+          # Copying a password out of a file usually brings a trailing
+          # newline with it, and Gradle only ever says "keystore password
+          # was incorrect". Strip line endings so that mistake is harmless.
+          KS_PASSWORD="$(printf '%s' "$KS_PASSWORD" | tr -d '\r\n')"
+          KEY_PASSWORD="$(printf '%s' "$KEY_PASSWORD" | tr -d '\r\n')"
+          KEY_ALIAS="$(printf '%s' "$KEY_ALIAS" | tr -d '\r\n')"
           ./gradlew --no-daemon --stacktrace assembleRelease \
             -Pandroid.injected.signing.store.file="$PWD/app/release.keystore" \
             -Pandroid.injected.signing.store.password="$KS_PASSWORD" \
