@@ -56,29 +56,41 @@
     });
   }
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
-  --bg: #0f0e0c;
-  --surface: #1a1916;
-  --surface2: #242220;
-  --surface3: #2e2b28;
-  --border: #3a3631;
-  --accent: #e8a043;
-  --accent2: #c4622d;
-  --accent3: #7ab648;
-  --accent4: #4a9fd4;
-  --accent5: #9b59b6;
-  --text: #f0ece4;
-  --text2: #a09890;
-  --text3: #6b6560;
-  --danger: #c94040;
-  --radius: 14px;
+  /* Surfaces — jellymusic's neutral ramp */
+  --bg: #0A0A0A;
+  --surface: #111111;
+  --surface2: #181818;
+  --surface3: #282828;
+  --border: #333333;
+
+  /* Text */
+  --text: #FFFFFF;
+  --text2: #B3B3B3;
+  --text3: #6B6B6B;
+
+  /* Accents */
+  --accent: #E8B84B;
+  --accent2: #FF8A4C;
+  --accent3: #5FD37E;
+  --accent4: #5BB8F5;
+  --accent5: #C084FC;
+  --danger: #FF5C5C;
+
+  /* Shape */
+  --radius: 12px;
+  --radius-card: 8px;
+  --radius-pill: 50px;
+  --radius-sm: 6px;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; max-width:520px; margin:0 auto; overflow-x:hidden; }
+body { font-family:'Figtree',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; max-width:520px; margin:0 auto; overflow-x:hidden; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-tap-highlight-color:transparent; }
 
 /* PAGES */
 .page { display:none; }
@@ -94,15 +106,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   flex:1; padding:10px 4px 13px;
   display:flex; flex-direction:column; align-items:center; gap:2px;
   cursor:pointer; border:none; background:none; color:var(--text3);
-  font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.5px;
+  font-family:'Figtree',sans-serif; font-size:10px; font-weight:600; letter-spacing:0.2px;
   position:relative; transition:color 0.2s;
 }
 .nav-tab.active { color:var(--accent); }
-.nav-tab-icon { font-family:monospace; font-size:10px; font-weight:600; letter-spacing:1px; color:inherit; }
+.nav-tab::after { content:''; width:4px; height:4px; border-radius:50%; background:var(--accent); opacity:0; margin-top:3px; transition:opacity 0.15s; }
+.nav-tab.active::after { opacity:1; }
+.nav-tab-icon { font-family:'Figtree',sans-serif; font-size:10px; font-weight:600; letter-spacing:0.2px; color:inherit; text-transform:none; }
 .nav-badge {
   position:absolute; top:6px; right:calc(50% - 22px);
   background:var(--accent2); color:#fff; font-size:9px; font-weight:700;
-  font-family:monospace; border-radius:8px; padding:1px 5px;
+  font-family:'Figtree',sans-serif; border-radius:var(--radius-pill); padding:1px 5px;
   min-width:16px; text-align:center; border:2px solid var(--surface);
 }
 
@@ -112,13 +126,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border);
 }
 .header-top { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px; }
-.app-title { font-family:'Playfair Display',serif; font-size:32px; font-weight:900; color:var(--accent); letter-spacing:-1px; line-height:1; }
-.app-subtitle { font-family:monospace; font-size:11px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+.app-title { font-family:'Figtree',sans-serif; font-size:30px; font-weight:900; color:var(--accent); letter-spacing:-1.2px; line-height:1.05; }
+.app-subtitle { font-family:'Figtree',sans-serif; font-size:10px; font-weight:800; color:var(--text3); letter-spacing:0.9px; text-transform:uppercase; margin-top:3px; white-space:nowrap; }
 .header-actions { display:flex; gap:8px; align-items:center; }
 .btn-icon {
-  height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--border);
+  height:34px; padding:0 12px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text2); font-size:12px;
-  font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center;
+  font-family:'Figtree',sans-serif; cursor:pointer; display:flex; align-items:center;
   transition:all 0.2s; white-space:nowrap;
 }
 .btn-icon:hover { background:var(--surface3); color:var(--text); }
@@ -127,7 +141,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .search-bar input {
   width:100%; background:var(--surface2); border:1px solid var(--border);
   border-radius:12px; padding:10px 16px; color:var(--text);
-  font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color 0.2s;
+  font-family:'Figtree',sans-serif; font-size:14px; outline:none; transition:border-color 0.2s;
 }
 .search-bar { position:relative; }
 .search-bar input { padding-right:40px !important; box-sizing:border-box; }
@@ -146,12 +160,12 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .cat-scroll::-webkit-scrollbar { display:none; }
 .cat-chips { display:flex; gap:8px; white-space:nowrap; }
 .cat-chip {
-  padding:6px 14px; border-radius:20px; border:1px solid var(--border);
+  padding:6px 14px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text2); font-size:13px;
   cursor:pointer; transition:all 0.2s; white-space:nowrap;
 }
 .cat-chip.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:600; }
-.chip-count { font-family:monospace; font-size:10px; margin-left:4px; opacity:0.7; }
+.chip-count { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:10px; margin-left:4px; opacity:0.7; }
 
 /* MAIN CONTENT */
 .main-content { padding:16px 20px 110px; }
@@ -160,49 +174,50 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .cat-section.drag-over > .cat-header { border-left-width:4px; opacity:0.7; border:1px dashed var(--accent); border-radius:var(--radius); }
 .cat-header {
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:10px; padding:10px 14px;
-  background:var(--surface); border-radius:var(--radius); border-left:3px solid var(--accent);
+  margin-bottom:4px; padding:6px 12px 6px 10px;
+  background:transparent; border-radius:0; border-left:3px solid var(--accent);
 }
 .cat-header-left { display:flex; align-items:center; cursor:pointer; flex:1; min-width:0; }
-.cat-name { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--text); }
-.cat-item-count { font-family:monospace; font-size:11px; color:var(--text3); }
+.cat-name { font-family:'Figtree',sans-serif; font-size:18px; font-weight:800; color:var(--text); letter-spacing:-0.3px; }
+.cat-item-count { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); }
 .cat-chevron {
   font-size:11px; color:var(--text3); margin-left:8px; transition:transform 0.2s;
-  font-family:monospace; flex-shrink:0;
+  font-family:'Figtree',sans-serif; flex-shrink:0;
 }
 .cat-chevron.collapsed { transform:rotate(-90deg); }
 .food-grid { display:flex; flex-direction:column; gap:6px; }
 .food-grid.collapsed { display:none; }
 .cat-header-actions { display:flex; gap:6px; }
 .btn-sm {
-  padding:4px 10px; border-radius:8px; border:1px solid var(--border);
+  padding:4px 10px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text2); font-size:12px;
-  cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif;
+  cursor:pointer; transition:all 0.15s; font-family:'Figtree',sans-serif;
 }
 .btn-sm:hover { background:var(--surface3); color:var(--text); }
 
 /* FOOD ITEMS */
 
 .food-item {
-  display:flex; align-items:center; background:var(--surface);
-  border-radius:10px; border:1px solid var(--border); padding:11px 12px;
-  cursor:pointer; transition:all 0.2s;
+  display:flex; align-items:center; background:transparent;
+  border-radius:var(--radius-card); border:none; padding:10px 12px;
+  cursor:pointer; transition:background 0.12s;
 }
-.food-item:hover { border-color:var(--accent); background:var(--surface2); }
+.food-item:hover { background:var(--surface2); }
+.food-item:active { background:var(--surface3); }
 .food-item.low-stock { border-left:3px solid var(--accent2); }
 .food-item.out-of-stock { opacity:0.5; }
 .food-item-info { flex:1; min-width:0; }
 .food-item-name { font-size:14px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .food-item-meta { display:flex; gap:8px; align-items:center; margin-top:3px; flex-wrap:wrap; }
-.food-item-qty { font-family:monospace; font-size:11px; color:var(--text3); }
+.food-item-qty { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); }
 .food-item-location { font-size:11px; color:var(--text3); background:var(--surface2); padding:1px 6px; border-radius:4px; }
-.food-item-expiry { font-family:monospace; font-size:11px; color:var(--accent2); }
+.food-item-expiry { font-family:'Figtree',sans-serif; font-size:11px; color:var(--accent2); }
 .stock-tag-low { font-size:11px; color:var(--accent2); font-weight:600; }
 .stock-tag-out { font-size:11px; color:var(--danger); font-weight:600; }
 .food-item-cart {
-  width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+  width:32px; height:32px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text3); font-size:16px;
-  font-family:monospace; font-weight:700; cursor:pointer;
+  font-family:'Figtree',sans-serif; font-weight:700; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:all 0.2s; flex-shrink:0; margin-left:8px;
 }
@@ -211,14 +226,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 
 /* FAB */
 .fab {
-  position:fixed; bottom:68px; right:50%; transform:translateX(50%);
-  max-width:480px; width:calc(100% - 40px); background:var(--accent); color:#000;
-  border:none; border-radius:16px; padding:16px; font-family:'DM Sans',sans-serif;
-  font-size:15px; font-weight:600; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  box-shadow:0 8px 32px rgba(232,160,67,0.35); transition:all 0.2s; z-index:50;
+  position:fixed; bottom:72px; right:50%; transform:translateX(50%);
+  width:auto; min-width:0; background:var(--accent); color:#000;
+  border:none; border-radius:var(--radius-pill); padding:13px 26px;
+  font-family:'Figtree',sans-serif; font-size:14px; font-weight:800;
+  letter-spacing:-0.2px; cursor:pointer; z-index:40;
+  box-shadow:0 6px 24px rgba(0,0,0,.55), 0 0 0 6px var(--bg);
+  transition:transform 0.12s;
 }
-.fab:hover { background:#f0b055; }
+.fab:active { transform:translateX(50%) scale(.94); }
+.fab:hover { background:#f2c868; }
 
 /* MODAL */
 .modal-overlay {
@@ -228,7 +245,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .modal-overlay.open { opacity:1; pointer-events:all; }
 .modal {
-  background:var(--surface); border-radius:24px 24px 0 0;
+  background:var(--surface2); border-radius:16px 16px 0 0;
   width:100%; max-width:520px; padding:24px 24px 40px;
   transform:translateY(100%);
   transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);
@@ -236,7 +253,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .modal-overlay.open .modal { transform:translateY(0); }
 .modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px; }
-.modal-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:20px; }
+.modal-title { font-family:'Figtree',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:20px; }
 
 /* FORM */
 .form-group { margin-bottom:16px; }
@@ -244,7 +261,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .form-input, .form-select, .form-textarea {
   width:100%; background:var(--surface2); border:1px solid var(--border);
   border-radius:10px; padding:12px 14px; color:var(--text);
-  font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
+  font-family:'Figtree',sans-serif; font-size:14px; outline:none;
   transition:border-color 0.2s; -webkit-appearance:none; appearance:none;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--accent); }
@@ -256,9 +273,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 /* STOCK */
 .stock-selector { display:flex; gap:6px; }
 .stock-opt {
-  flex:1; padding:9px 6px; border-radius:8px; border:1px solid var(--border);
+  flex:1; padding:9px 6px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text2); font-size:12px;
-  text-align:center; cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif;
+  text-align:center; cursor:pointer; transition:all 0.15s; font-family:'Figtree',sans-serif;
 }
 .stock-opt.selected { border-color:var(--accent3); background:rgba(122,182,72,0.15); color:var(--accent3); }
 .stock-opt.low.selected { border-color:var(--accent2); background:rgba(196,98,45,0.15); color:var(--accent2); }
@@ -266,19 +283,19 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 
 .btn-row { display:flex; gap:10px; margin-top:20px; }
 .btn-primary {
-  flex:1; padding:14px; background:var(--accent); border:none; border-radius:12px;
-  color:#000; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600;
+  flex:1; padding:14px; background:var(--accent); border:none; border-radius:var(--radius-pill);
+  color:#000; font-family:'Figtree',sans-serif; font-size:15px; font-weight:600;
   cursor:pointer; transition:all 0.2s;
 }
 .btn-primary:hover { background:#f0b055; }
 .btn-secondary {
   padding:14px 20px; background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; color:var(--text2); font-family:'DM Sans',sans-serif; font-size:15px; cursor:pointer;
+  border-radius:var(--radius-pill); color:var(--text2); font-family:'Figtree',sans-serif; font-size:15px; cursor:pointer;
 }
 .btn-secondary:hover { background:var(--surface3); }
 .btn-danger {
   padding:14px 16px; background:rgba(201,64,64,0.12); border:1px solid rgba(201,64,64,0.3);
-  border-radius:12px; color:var(--danger); font-family:'DM Sans',sans-serif; font-size:15px; cursor:pointer;
+  border-radius:12px; color:var(--danger); font-family:'Figtree',sans-serif; font-size:15px; cursor:pointer;
 }
 
 /* CAT MANAGE */
@@ -288,7 +305,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .cat-color-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .cat-manage-name { flex:1; font-size:14px; color:var(--text); }
-.cat-manage-count { font-family:monospace; font-size:11px; color:var(--text3); }
+.cat-manage-count { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); }
 .color-opts { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
 .color-opt { width:24px; height:24px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all 0.15s; flex-shrink:0; }
 .color-opt.selected { border-color:white; transform:scale(1.2); }
@@ -303,9 +320,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .drag-bar { width:14px; height:2px; background:var(--text3); border-radius:1px; }
 
 /* SECTION DIVIDER */
-.section-divider {
-  font-family:monospace; font-size:10px; text-transform:uppercase;
-  letter-spacing:2px; color:var(--text3);
+.section-divider { font-weight:800;
+  font-family:'Figtree',sans-serif; font-size:10px; text-transform:uppercase;
+  letter-spacing:1.4px; color:var(--text3);
   display:flex; align-items:center; gap:10px; margin:20px 0 12px;
 }
 .section-divider::after { content:''; flex:1; height:1px; background:var(--border); }
@@ -313,8 +330,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 /* EMPTY STATE */
 .empty-state { text-align:center; padding:48px 20px; color:var(--text3); }
 .empty-state p { font-size:14px; line-height:1.7; }
-.empty-label {
-  font-family:monospace; font-size:11px; letter-spacing:3px;
+.empty-label { font-weight:800;
+  font-family:'Figtree',sans-serif; font-size:11px; letter-spacing:1.4px;
   color:var(--border); margin-bottom:16px; padding:18px 24px;
   border:1px dashed var(--border); border-radius:12px; display:inline-block;
 }
@@ -331,13 +348,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 /* ══ SHOPPING LIST ══ */
 .shop-progress { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:12px; }
 .shop-progress-fill { height:100%; background:var(--accent3); border-radius:2px; transition:width 0.4s ease; }
-.shop-progress-label { font-family:monospace; font-size:11px; color:var(--text3); margin-top:5px; }
+.shop-progress-label { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); margin-top:5px; }
 .shop-content { padding:16px 20px 130px; }
 
 .shop-item {
-  display:flex; align-items:center; gap:10px; background:var(--surface);
-  border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px;
-  transition:opacity 0.2s;
+  display:flex; align-items:center; gap:10px; background:transparent;
+  border:none; border-radius:var(--radius-card); padding:11px 12px; margin-bottom:2px;
+  transition:background 0.12s;
 }
 .shop-item.checked { opacity:0.4; }
 .shop-item.checked .shop-item-name { text-decoration:line-through; color:var(--text3); }
@@ -349,25 +366,25 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .shop-item.checked .shop-check { background:var(--accent3); border-color:var(--accent3); color:#fff; }
 .shop-item-info { flex:1; min-width:0; }
 .shop-item-name { font-size:14px; font-weight:500; color:var(--text); }
-.shop-item-sub { font-family:monospace; font-size:11px; color:var(--text3); margin-top:2px; }
+.shop-item-sub { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); margin-top:2px; }
 .shop-qty-ctrl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 .qty-btn {
-  width:28px; height:28px; border-radius:8px; border:1px solid var(--border);
+  width:28px; height:28px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text); font-size:16px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-family:monospace;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-family:'Figtree',sans-serif;
 }
 .qty-btn:hover { background:var(--surface3); border-color:var(--accent); }
-.qty-num { font-family:monospace; font-size:14px; font-weight:500; color:var(--text); min-width:22px; text-align:center; }
+.qty-num { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:14px; font-weight:500; color:var(--text); min-width:22px; text-align:center; }
 .shop-del {
-  width:28px; height:28px; border-radius:8px; border:1px solid transparent;
+  width:28px; height:28px; border-radius:var(--radius-pill); border:1px solid transparent;
   background:transparent; color:var(--text3); font-size:13px; cursor:pointer;
   display:flex; align-items:center; justify-content:center; transition:all 0.15s; margin-left:2px;
-  font-family:monospace;
+  font-family:'Figtree',sans-serif;
 }
 .shop-del:hover { color:var(--danger); background:rgba(201,64,64,0.1); border-color:rgba(201,64,64,0.3); }
-.shop-section-head {
-  font-family:monospace; font-size:10px; text-transform:uppercase;
-  letter-spacing:2px; color:var(--text3); margin:18px 0 8px;
+.shop-section-head { font-weight:800;
+  font-family:'Figtree',sans-serif; font-size:10px; text-transform:uppercase;
+  letter-spacing:1.4px; color:var(--text3); margin:18px 0 8px;
   display:flex; align-items:center; gap:8px;
 }
 .shop-section-head::after { content:''; flex:1; height:1px; background:var(--border); }
@@ -378,14 +395,14 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .fab-main {
   flex:1; background:var(--accent); color:#000; border:none; border-radius:16px;
-  padding:16px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600;
+  padding:16px; font-family:'Figtree',sans-serif; font-size:15px; font-weight:600;
   cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
   box-shadow:0 8px 32px rgba(232,160,67,0.35); transition:all 0.2s;
 }
 .fab-main:hover { background:#f0b055; }
 .fab-sec {
   background:var(--surface2); border:1px solid var(--border); border-radius:16px;
-  padding:16px 16px; color:var(--text2); font-size:13px; font-family:'DM Sans',sans-serif;
+  padding:16px 16px; color:var(--text2); font-size:13px; font-family:'Figtree',sans-serif;
   cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); transition:all 0.2s; white-space:nowrap;
 }
 .fab-sec:hover { color:var(--danger); border-color:var(--danger); background:rgba(201,64,64,0.08); }
@@ -394,13 +411,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .pantry-pick-list { max-height:260px; overflow-y:auto; }
 .pantry-pick-item {
   display:flex; align-items:center; gap:10px; padding:10px 12px;
-  border-radius:10px; cursor:pointer; transition:background 0.15s;
+  border-radius:var(--radius-card); cursor:pointer; transition:background 0.15s;
 }
 .pantry-pick-item:hover { background:var(--surface2); }
 .pantry-pick-item.in-list { opacity:0.35; pointer-events:none; }
 .pantry-pick-name { flex:1; font-size:14px; color:var(--text); }
-.pantry-pick-qty { font-family:monospace; font-size:11px; color:var(--text3); margin-left:4px; }
-.pantry-pick-add { font-size:16px; color:var(--accent); font-weight:700; font-family:monospace; width:24px; text-align:center; }
+.pantry-pick-qty { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); margin-left:4px; }
+.pantry-pick-add { font-size:16px; color:var(--accent); font-weight:700; font-family:'Figtree',sans-serif; width:24px; text-align:center; }
 
 /* ══ RECIPES ══ */
 .rec-content { padding:16px 20px 130px; }
@@ -412,10 +429,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .recipe-card:hover { border-color:var(--accent); background:var(--surface2); }
 .recipe-card-header { padding:14px 16px 12px; }
 .recipe-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-.recipe-title { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--text); line-height:1.2; }
+.recipe-title { font-family:'Figtree',sans-serif; font-size:17px; font-weight:700; color:var(--text); line-height:1.2; }
 .recipe-meta { display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap; }
-.recipe-tag {
-  font-family:monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase;
+.recipe-tag { font-weight:800;
+  font-family:'Figtree',sans-serif; font-size:10px; letter-spacing:0.8px; text-transform:uppercase;
   padding:2px 8px; border-radius:4px; border:1px solid var(--border); color:var(--text3); background:var(--surface2);
 }
 .recipe-tag.cuisine { border-color:var(--accent4); color:var(--accent4); background:rgba(74,159,212,0.08); }
@@ -428,7 +445,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .recipe-actions { display:flex; gap:1px; background:var(--border); border-top:1px solid var(--border); }
 .recipe-action-btn {
   flex:1; padding:10px 8px; background:var(--surface); color:var(--text3);
-  font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; border:none;
+  font-size:12px; font-family:'Figtree',sans-serif; cursor:pointer; border:none;
   transition:all 0.15s; text-align:center;
 }
 .recipe-action-btn:hover { background:var(--surface2); color:var(--text); }
@@ -437,9 +454,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 
 /* RECIPE DETAIL MODAL */
 .recipe-detail-section { margin-bottom:20px; }
-.recipe-detail-label {
-  font-family:monospace; font-size:10px; text-transform:uppercase;
-  letter-spacing:2px; color:var(--text3); margin-bottom:10px;
+.recipe-detail-label { font-weight:800;
+  font-family:'Figtree',sans-serif; font-size:10px; text-transform:uppercase;
+  letter-spacing:1.4px; color:var(--text3); margin-bottom:10px;
   display:flex; align-items:center; gap:8px;
 }
 .recipe-detail-label::after { content:''; flex:1; height:1px; background:var(--border); }
@@ -451,15 +468,15 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .ingredient-row.have { border-color:rgba(122,182,72,0.3); background:rgba(122,182,72,0.06); }
 .ingredient-row.missing { border-color:rgba(196,98,45,0.3); background:rgba(196,98,45,0.06); }
 .ingredient-name { flex:1; font-size:13px; color:var(--text); }
-.ingredient-qty { font-family:monospace; font-size:11px; color:var(--text3); }
+.ingredient-qty { font-variant-numeric:tabular-nums; font-weight:600; font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3); }
 .ingredient-status { font-size:11px; font-weight:600; width:14px; text-align:center; }
 .ingredient-status.have { color:var(--accent3); }
 .ingredient-status.missing { color:var(--accent2); }
 
 .step-row { display:flex; gap:12px; margin-bottom:10px; }
-.step-num {
+.step-num { font-variant-numeric:tabular-nums; font-weight:600;
   width:24px; height:24px; border-radius:50%; background:var(--surface2); border:1px solid var(--border);
-  font-family:monospace; font-size:11px; font-weight:600; color:var(--text3);
+  font-family:'Figtree',sans-serif; font-size:11px; font-weight:600; color:var(--text3);
   display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
 }
 .step-text { font-size:14px; color:var(--text2); line-height:1.6; flex:1; }
@@ -472,21 +489,21 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .edit-ing-row .form-input { flex:1; padding:8px 10px; font-size:13px; }
 .edit-ing-del {
   width:30px; height:30px; border-radius:8px; border:1px solid var(--border);
-  background:var(--surface2); color:var(--text3); font-size:14px; font-family:monospace;
+  background:var(--surface2); color:var(--text3); font-size:14px; font-family:'Figtree',sans-serif;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   flex-shrink:0; transition:all 0.15s;
 }
 .edit-ing-del:hover { color:var(--danger); border-color:var(--danger); background:rgba(201,64,64,0.1); }
 .edit-step-list { margin-bottom:8px; }
 .edit-step-row { display:flex; align-items:flex-start; gap:6px; margin-bottom:6px; }
-.step-label {
+.step-label { font-variant-numeric:tabular-nums; font-weight:600;
   width:30px; height:36px; border-radius:8px; background:var(--surface2); border:1px solid var(--border);
-  font-family:monospace; font-size:11px; color:var(--text3);
+  font-family:'Figtree',sans-serif; font-size:11px; color:var(--text3);
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
 .edit-step-row textarea {
   flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px;
-  padding:8px 10px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px;
+  padding:8px 10px; color:var(--text); font-family:'Figtree',sans-serif; font-size:13px;
   outline:none; resize:none; min-height:36px; line-height:1.4; transition:border-color 0.2s;
 }
 .edit-step-row textarea:focus { border-color:var(--accent); }
@@ -494,9 +511,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .rec-filter-row { display:flex; gap:8px; padding:12px 20px 0; overflow-x:auto; scrollbar-width:none; }
 .rec-filter-row::-webkit-scrollbar { display:none; }
 .rec-filter-chip {
-  padding:5px 12px; border-radius:16px; border:1px solid var(--border);
+  padding:5px 12px; border-radius:var(--radius-pill); border:1px solid var(--border);
   background:var(--surface2); color:var(--text2); font-size:12px;
-  cursor:pointer; transition:all 0.2s; white-space:nowrap; font-family:'DM Sans',sans-serif;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap; font-family:'Figtree',sans-serif;
 }
 .rec-filter-chip.active { background:var(--accent4); border-color:var(--accent4); color:#fff; }
 
@@ -512,7 +529,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .autocomplete-dropdown {
   position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:500;
   background:var(--surface2); border:1px solid var(--accent);
-  border-radius:10px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  border-radius:var(--radius-card); overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.5);
 }
 .autocomplete-item {
   padding:10px 14px; cursor:pointer; font-size:14px; color:var(--text);
@@ -522,8 +539,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .autocomplete-item:last-child { border-bottom:none; }
 .autocomplete-item:hover, .autocomplete-item.ac-selected { background:var(--surface3); }
 .autocomplete-item-name { flex:1; }
-.autocomplete-item-cat { font-size:11px; color:var(--text3); font-family:monospace; }
-.autocomplete-item-qty { font-size:11px; color:var(--text3); font-family:monospace; }
+.autocomplete-item-cat { font-variant-numeric:tabular-nums; font-weight:600; font-size:11px; color:var(--text3); font-family:'Figtree',sans-serif; }
+.autocomplete-item-qty { font-variant-numeric:tabular-nums; font-weight:600; font-size:11px; color:var(--text3); font-family:'Figtree',sans-serif; }
 
 /* ── PANTRY VALUE BANNER ── */
 .pantry-value-banner {
@@ -534,14 +551,14 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .pvb-left { display:flex; align-items:center; gap:10px; }
 .pvb-icon { font-size:18px; }
-.pvb-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; font-family:monospace; }
-.pvb-value { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:var(--accent3); line-height:1; }
+.pvb-label { font-weight:800; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1.2px; font-family:'Figtree',sans-serif; }
+.pvb-value { font-family:'Figtree',sans-serif; font-size:22px; font-weight:900; color:var(--accent3); line-height:1; }
 .pvb-sub { font-size:11px; color:var(--text3); margin-top:1px; }
 .pvb-right { text-align:right; }
 
 /* ── EXPIRING SOON BUTTON & BANNER ── */
 .cat-chip.expiring {
-  background:rgba(196,98,45,0.15); border-color:rgba(196,98,45,0.5); color:var(--accent2);
+  background:rgba(255,138,76,0.12); border-color:transparent; color:var(--accent2);
 }
 .cat-chip.expiring.active { background:var(--accent2); border-color:var(--accent2); color:#fff; }
 .food-item-expiry.urgent { color:var(--danger); font-weight:700; animation:urgentPulse 2s ease infinite; }
@@ -559,13 +576,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .cooked-ing-list { max-height:220px; overflow-y:auto; margin:12px 0; }
 .cooked-ing-row {
   display:flex; align-items:center; gap:10px; padding:9px 12px;
-  border-radius:8px; margin-bottom:6px; border:1px solid var(--border);
+  border-radius:var(--radius-card); margin-bottom:6px; border:1px solid var(--border);
   background:var(--surface2);
 }
 .cooked-ing-row.have { border-color:rgba(122,182,72,0.3); }
 .cooked-ing-row.missing { opacity:0.5; }
 .cooked-ing-name { flex:1; font-size:13px; color:var(--text); }
-.cooked-ing-qty { font-size:12px; color:var(--text3); font-family:monospace; }
+.cooked-ing-qty { font-variant-numeric:tabular-nums; font-weight:600; font-size:12px; color:var(--text3); font-family:'Figtree',sans-serif; }
 .cooked-ing-status { font-size:12px; font-weight:700; width:18px; text-align:center; }
 .cooked-ing-status.have { color:var(--accent3); }
 .cooked-ing-status.missing { color:var(--danger); }
@@ -589,14 +606,18 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 /* Leaflet popup dark theme */
 
 .swipe-wrap {
-  position:relative; overflow:hidden; border-radius:10px;
+  position:relative; overflow:hidden; border-radius:var(--radius-card);
 }
 .swipe-delete-bg {
-  position:absolute; inset:0; background:var(--danger);
+  /* Inset by 2px and slightly tighter radius: at 2x DPR the row sliding on
+     top antialiases its rounded corners, and a flush red sheet bled through
+     as a dotted ring around every item. Pulling it in guarantees the opaque
+     row always covers it until an actual swipe moves the row away. */
+  position:absolute; inset:2px; background:var(--danger);
   display:flex; align-items:center; justify-content:flex-end;
-  padding-right:20px; border-radius:10px;
-  font-size:13px; font-weight:600; color:#fff;
-  font-family:'DM Sans',sans-serif; letter-spacing:0.5px;
+  padding-right:20px; border-radius:6px;
+  font-size:13px; font-weight:700; color:#fff;
+  font-family:'Figtree',sans-serif; letter-spacing:0.2px;
   pointer-events:none;
 }
 .swipe-inner {
@@ -604,7 +625,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   transition:transform 0.15s ease;
   will-change:transform;
   background:var(--bg);
-  border-radius:10px;
+  border-radius:var(--radius-card);
 }
 .swipe-inner.snapping { transition:transform 0.2s ease; }
 .swipe-inner.deleting {
@@ -618,7 +639,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   width:100%; height:100%;
   background:var(--bg); z-index:9000;
   display:flex; flex-direction:column;
-  font-family:'DM Sans',sans-serif;
+  font-family:'Figtree',sans-serif;
   animation:sugOverlayIn 0.2s cubic-bezier(0.32,0.72,0,1);
 }
 @keyframes sugOverlayIn {
@@ -627,11 +648,11 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 
 .suggest-title {
-  font-family:'Playfair Display',serif; font-size:22px; font-weight:900;
+  font-family:'Figtree',sans-serif; font-size:22px; font-weight:900;
   color:var(--accent); letter-spacing:-0.5px;
 }
 .suggest-subtitle {
-  font-size:11px; color:var(--text3); font-family:monospace;
+  font-size:11px; color:var(--text3); font-family:'Figtree',sans-serif;
   letter-spacing:1.5px; text-transform:uppercase; margin-top:2px;
 }
 
@@ -657,7 +678,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .photo-remove-btn {
   position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7);
   color:#fff; border:none; border-radius:6px; padding:4px 8px;
-  font-size:11px; cursor:pointer; font-family:monospace;
+  font-size:11px; cursor:pointer; font-family:'Figtree',sans-serif;
 }
 .recipe-photo-view {
   width:100%; display:block; border-radius:12px;
@@ -745,7 +766,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 /* COOKING MODE */
 .cooking-overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:200;display:flex;flex-direction:column;max-width:520px;left:50%;transform:translateX(-50%); }
 .cooking-header { padding:48px 20px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
-.cooking-title { font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent); }
+.cooking-title { font-family:'Figtree',sans-serif;font-size:22px;font-weight:700;color:var(--accent); }
 .cooking-body { flex:1;overflow-y:auto;padding:20px; }
 .cooking-ing-grid { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px; }
 .cooking-ing-chip { padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.2s;user-select:none; }
@@ -753,13 +774,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .cooking-step-card { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;transition:all 0.3s; }
 .cooking-step-card.active { border-color:var(--accent);background:rgba(232,160,67,0.06); }
 .cooking-step-card.done { opacity:0.45; }
-.cooking-step-num { font-family:monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
+.cooking-step-num { font-family:'Figtree',sans-serif;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
 .cooking-step-text { font-size:15px;color:var(--text);line-height:1.6; }
 .cooking-step-ings { display:flex;flex-wrap:wrap;gap:6px;margin-top:10px; }
-.cooking-step-ing { font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(232,160,67,0.1);border:1px solid rgba(232,160,67,0.2);color:var(--accent);font-family:monospace; }
+.cooking-step-ing { font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(232,160,67,0.1);border:1px solid rgba(232,160,67,0.2);color:var(--accent);font-family:'Figtree',sans-serif; }
 .cooking-timer { display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border); }
-.cooking-timer-display { font-family:monospace;font-size:22px;font-weight:600;color:var(--accent);min-width:60px; }
-.cooking-timer-btn { padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif; }
+.cooking-timer-display { font-family:'Figtree',sans-serif;font-size:22px;font-weight:600;color:var(--accent);min-width:60px; }
+.cooking-timer-btn { padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:13px;font-weight:600;cursor:pointer;font-family:'Figtree',sans-serif; }
 .cooking-timer-btn.stop { background:var(--surface3);color:var(--text2); }
 .cooking-nav { display:flex;gap:8px;padding:16px 20px;background:var(--surface);border-top:1px solid var(--border); }
 /* RECIPE TIMER */
@@ -775,8 +796,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .rec-dropdown-panel.open {
   max-height:56px; opacity:1; padding:10px 16px;
 }
-.rec-timer-display { font-family:monospace;font-size:20px;font-weight:600;color:var(--accent);min-width:56px; }
-.rec-timer-btn { padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif; }
+.rec-timer-display { font-family:'Figtree',sans-serif;font-size:20px;font-weight:600;color:var(--accent);min-width:56px; }
+.rec-timer-btn { padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;font-family:'Figtree',sans-serif; }
 .rec-timer-btn.active { background:var(--accent);border-color:var(--accent);color:#000;font-weight:600; }
 .btn-icon.timer-active { background:rgba(232,160,67,0.15); border-color:rgba(232,160,67,0.5); color:var(--accent); }
 
@@ -790,7 +811,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .mp-open-btn {
   width:100%; margin-top:10px; padding:11px 16px;
   background:rgba(232,160,67,0.08); border:1px solid rgba(232,160,67,0.25);
-  border-radius:12px; color:var(--accent); font-family:'DM Sans',sans-serif;
+  border-radius:12px; color:var(--accent); font-family:'Figtree',sans-serif;
   font-size:14px; font-weight:600; cursor:pointer; text-align:left;
   display:flex; align-items:center; gap:8px; transition:all 0.2s;
   letter-spacing:0.2px;
@@ -813,17 +834,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   background:var(--surface2); border-radius:12px; border:1px solid var(--border);
 }
 .mp-week-nav-label {
-  font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--text);
+  font-family:'Figtree',sans-serif; font-size:16px; font-weight:700; color:var(--text);
 }
 .mp-week-nav-sub {
-  font-family:monospace; font-size:10px; color:var(--text3); letter-spacing:1px;
+  font-family:'Figtree',sans-serif; font-size:10px; color:var(--text3); letter-spacing:1px;
   text-transform:uppercase; margin-top:1px;
 }
 .mp-week-btn {
   width:34px; height:34px; border-radius:10px; border:1px solid var(--border);
   background:var(--surface3); color:var(--text2); font-size:16px; cursor:pointer;
   display:flex; align-items:center; justify-content:center; transition:all 0.15s;
-  font-family:monospace;
+  font-family:'Figtree',sans-serif;
 }
 .mp-week-btn:hover { border-color:var(--accent); color:var(--accent); }
 
@@ -837,12 +858,12 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   padding:11px 14px 10px;
 }
 .mp-day-name {
-  font-family:monospace; font-size:11px; font-weight:700; text-transform:uppercase;
+  font-family:'Figtree',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase;
   letter-spacing:2px; color:var(--text3);
 }
 .mp-day-name.today-label { color:var(--accent); }
 .mp-day-date {
-  font-family:monospace; font-size:10px; color:var(--text3); opacity:0.6;
+  font-family:'Figtree',sans-serif; font-size:10px; color:var(--text3); opacity:0.6;
 }
 .mp-slot-empty {
   display:flex; align-items:center; gap:8px;
@@ -872,15 +893,15 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   font-size:12px; font-weight:600; color:var(--text);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.mp-slot-meta { font-family:monospace; font-size:10px; color:var(--text3); margin-top:2px; }
+.mp-slot-meta { font-family:'Figtree',sans-serif; font-size:10px; color:var(--text3); margin-top:2px; }
 .mp-slot-missing {
-  font-size:10px; color:var(--accent2); font-family:monospace; margin-top:2px;
+  font-size:10px; color:var(--accent2); font-family:'Figtree',sans-serif; margin-top:2px;
 }
 .mp-slot-edit-icon {
   width:28px; height:28px; border-radius:8px; border:1px solid var(--border);
   background:var(--surface2); color:var(--text3); font-size:13px;
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  transition:all 0.15s; cursor:pointer; font-family:monospace;
+  transition:all 0.15s; cursor:pointer; font-family:'Figtree',sans-serif;
 }
 .mp-slot-filled:hover .mp-slot-edit-icon { border-color:var(--accent); color:var(--accent); background:rgba(232,160,67,0.08); }
 
@@ -891,8 +912,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   border-top:1px solid var(--border);
 }
 .mp-shop-btn {
-  width:100%; padding:14px; border-radius:14px; border:none;
-  background:var(--accent3); color:#fff; font-family:'DM Sans',sans-serif;
+  width:100%; padding:14px; border-radius:var(--radius-pill); border:none;
+  background:var(--accent3); color:#fff; font-family:'Figtree',sans-serif;
   font-size:14px; font-weight:700; cursor:pointer; transition:opacity 0.2s;
   margin-bottom:12px;
 }
@@ -927,9 +948,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   justify-content:center; font-size:16px; flex-shrink:0;
 }
 .mp-picker-name { flex:1; font-size:14px; font-weight:500; color:var(--text); }
-.mp-picker-meta { font-family:monospace; font-size:10px; color:var(--text3); margin-top:2px; }
-.mp-picker-ok { font-size:11px; color:var(--accent3); font-weight:600; font-family:monospace; }
-.mp-picker-miss { font-size:11px; color:var(--accent2); font-family:monospace; }
+.mp-picker-meta { font-family:'Figtree',sans-serif; font-size:10px; color:var(--text3); margin-top:2px; }
+.mp-picker-ok { font-size:11px; color:var(--accent3); font-weight:600; font-family:'Figtree',sans-serif; }
+.mp-picker-miss { font-size:11px; color:var(--accent2); font-family:'Figtree',sans-serif; }
 
 /* ── TODAY'S MEAL BANNER ── */
 .today-meal-banner {
@@ -940,7 +961,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   animation:slideIn 0.2s ease;
 }
 .today-meal-day {
-  font-family:monospace; font-size:10px; text-transform:uppercase;
+  font-family:'Figtree',sans-serif; font-size:10px; text-transform:uppercase;
   letter-spacing:1.5px; color:var(--accent); flex-shrink:0;
 }
 .today-meal-name {
@@ -950,14 +971,14 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .today-meal-btn {
   padding:5px 12px; border-radius:8px; border:1px solid var(--border);
   background:var(--surface2); color:var(--accent); font-size:12px;
-  font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer;
+  font-weight:600; font-family:'Figtree',sans-serif; cursor:pointer;
   flex-shrink:0; transition:all 0.15s; white-space:nowrap;
 }
 .today-meal-btn:hover { background:rgba(232,160,67,0.12); border-color:var(--accent); }
 .reminder-open-btn {
   margin-top:10px; padding:8px 14px;
   background:var(--surface2); border:1px solid var(--border);
-  border-radius:20px; color:var(--text2); font-family:'DM Sans',sans-serif;
+  border-radius:20px; color:var(--text2); font-family:'Figtree',sans-serif;
   font-size:13px; font-weight:500; cursor:pointer;
   display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;
 }
@@ -967,7 +988,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .mp-stats-toggle-btn {
   width:100%; padding:11px 16px; margin-bottom:8px;
   background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; color:var(--text3); font-family:'DM Sans',sans-serif;
+  border-radius:var(--radius-pill); color:var(--text3); font-family:'Figtree',sans-serif;
   font-size:13px; cursor:pointer; text-align:center; transition:all 0.2s;
 }
 .mp-stats-toggle-btn:hover { border-color:var(--accent); color:var(--text); }
@@ -975,8 +996,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 
 /* ── RECIPE TYPE SELECTOR ── */
 .rec-type-btn {
-  flex:1; padding:9px 6px; border-radius:10px; border:1px solid var(--border);
-  background:var(--surface2); color:var(--text3); font-family:'DM Sans',sans-serif;
+  flex:1; padding:9px 6px; border-radius:var(--radius-pill); border:1px solid var(--border);
+  background:var(--surface2); color:var(--text3); font-family:'Figtree',sans-serif;
   font-size:13px; cursor:pointer; transition:all 0.15s; text-align:center;
 }
 .rec-type-btn.selected { background:var(--accent); border-color:var(--accent); color:#000; font-weight:600; }
@@ -1069,7 +1090,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
   <!-- Convert dropdown — overlays content, sits just below header -->
   <div class="rec-dropdown-panel" id="recConvertBar" style="flex-wrap:wrap;gap:6px">
     <div style="display:flex;align-items:center;gap:6px;width:100%">
-      <select id="convFrom" onchange="runConvert()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
+      <select id="convFrom" onchange="runConvert()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-family:'Figtree',sans-serif;font-size:13px;outline:none">
         <option value="">From…</option>
         <optgroup label="Volume">
           <option value="cup_ml">Cups → ml</option>
@@ -1100,8 +1121,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
           <option value="cup_butter">Cup Butter → g</option>
         </optgroup>
       </select>
-      <input id="convAmt" type="number" step="any" placeholder="Amount" oninput="runConvert()" style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none">
-      <div id="convResult" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--accent);min-width:60px;text-align:right">—</div>
+      <input id="convAmt" type="number" step="any" placeholder="Amount" oninput="runConvert()" style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-family:'Figtree',sans-serif;font-size:13px;outline:none">
+      <div id="convResult" style="font-family:'Figtree',sans-serif;font-size:14px;font-weight:600;color:var(--accent);min-width:60px;text-align:right">—</div>
     </div>
   </div>
   <div class="rec-filter-row" id="recFilterRow"></div>
@@ -1219,7 +1240,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       ⬇ Download Backup
     </button>
 
-    <div style="font-size:11px;color:var(--text3);font-family:monospace;text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 8px">Restore from backup</div>
+    <div style="font-size:11px;color:var(--text3);font-family:'Figtree',sans-serif;text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 8px">Restore from backup</div>
     <div id="backupDropArea" style="border:1px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:border-color 0.15s" onclick="document.getElementById('backupFileInput').click()">
       <input type="file" id="backupFileInput" accept=".json" style="display:none" onchange="handleRestoreFile(this)">
       <div style="font-size:22px;margin-bottom:6px">📂</div>
@@ -1240,63 +1261,63 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
     <div class="modal-handle"></div>
 
     <div style="text-align:center;padding:8px 0 20px">
-      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--accent);letter-spacing:-0.5px">Pantry</div>
-      <div style="font-family:monospace;font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:3px">a little guide</div>
+      <div style="font-family:'Figtree',sans-serif;font-size:26px;font-weight:900;color:var(--accent);letter-spacing:-0.5px">Pantry</div>
+      <div style="font-family:'Figtree',sans-serif;font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:3px">a little guide</div>
     </div>
 
     <div style="display:grid;gap:6px;margin-bottom:16px">
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Pantry</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Pantry</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Track items by name, category, qty, location, stock level and expiry. Quick-add from search. Swipe left to delete. ＋ sends to shopping list. Categories are draggable. <em style="color:var(--text)">🔔 Reminder</em> downloads a .ics calendar file with an alert. Today's planned meal shows at the top — tap View or Cook.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Shopping List</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Shopping List</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Out-of-stock items auto-appear. <em style="color:var(--text)">+ Low Stock</em> bulk-adds. Recipes add missing ingredients only. <em style="color:var(--text)">Maybe</em> holds treats separately. Tick off as you shop.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Recipes</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Recipes</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Sorted by what you can cook now. Filter by Can Make, In Season, or cuisine. Cook mode: tick ingredients, scale servings, step-by-step with auto-timers. Cooked It deducts pantry. Header: ⏱ Timer, ⇄ Convert, 📅 Meal Planner.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Meal Planner</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Meal Planner</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Plan meals day by day. Assign leftovers from the previous day. Copy last week in one tap. Auto-generate a shopping list for missing ingredients. Navigate past/future weeks. Tap 📊 for cooking stats.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Bar</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Bar</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Same as Recipes but for cocktails — method, glassware, garnish, difficulty, photo. Pantry-aware, guided mode, drag to reorder.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Self</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Self</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Hydration tracker with daily goal. Meal check-ins (Breakfast / Lunch / Dinner) — tracked silently for future analytics. Meditation with breathing + binaural beats. In Season Melbourne produce. Wordle, Words with Grease, Coin flip, Radio.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Map</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Map</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Pin places across Victoria. Search any address. 🌙 for dark tiles. Pins sync live.</div>
       </div>
 
       <div style="background:var(--surface2);border-radius:11px;padding:12px 14px;border:1px solid var(--border)">
-        <div style="font-size:11px;font-family:monospace;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Backup</div>
+        <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Backup</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">Top right of Pantry. Download everything as a JSON file and restore any time. Do it occasionally.</div>
       </div>
 
     </div>
 
     <div style="background:rgba(232,160,67,0.06);border:1px solid rgba(232,160,67,0.15);border-radius:11px;padding:10px 14px;margin-bottom:4px">
-      <div style="font-size:11px;font-family:monospace;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Known issues</div>
+      <div style="font-size:11px;font-family:'Figtree',sans-serif;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Known issues</div>
       <div style="font-size:12px;color:var(--text2)">No known bugs presently.</div>
     </div>
 
     <div class="btn-row" style="margin-top:18px">
       <button class="btn-secondary" onclick="document.getElementById('kamiSuggestionsMsg').style.display=document.getElementById('kamiSuggestionsMsg').style.display==='block'?'none':'block'" style="flex:1">SUGGESTIONS FOR KAMI</button>
     </div>
-    <div id="kamiSuggestionsMsg" style="display:none;text-align:center;font-size:13px;color:var(--text3);padding:12px 0 4px;font-family:monospace">talk to Kami to offer feedback lol</div>
+    <div id="kamiSuggestionsMsg" style="display:none;text-align:center;font-size:13px;color:var(--text3);padding:12px 0 4px;font-family:'Figtree',sans-serif">talk to Kami to offer feedback lol</div>
 
     <div class="btn-row" style="margin-top:10px">
       <button class="btn-primary" onclick="closeModal('kamiNotesModal')" style="width:100%">Let's cook</button>
@@ -1396,7 +1417,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       <button class="btn-secondary" onclick="_teardownReminderKeyboard();closeModal('reminderModal')">Cancel</button>
       <button class="btn-primary" onclick="downloadReminder()">⬇ Add to Calendar</button>
     </div>
-    <div style="font-size:11px;color:var(--text3);font-family:monospace;text-align:center;margin-top:12px;line-height:1.6;letter-spacing:0.3px">
+    <div style="font-size:11px;color:var(--text3);font-family:'Figtree',sans-serif;text-align:center;margin-top:12px;line-height:1.6;letter-spacing:0.3px">
       Downloads a .ics file — open it to add to any calendar app with an alert already set.
     </div>
   </div>
@@ -1651,7 +1672,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .undo-bar button {
   background:var(--accent); color:#000; border:none; border-radius:16px;
   padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer;
-  font-family:monospace; letter-spacing:0.5px; flex-shrink:0;
+  font-family:'Figtree',sans-serif; letter-spacing:0.5px; flex-shrink:0;
 }
 </style>
 <div class="undo-bar" id="undoBar">
@@ -1890,7 +1911,7 @@ function renderTodayMealBanner() {
     banner.innerHTML =
       '<div class="today-meal-banner" style="border-left-color:var(--border)">' +
         '<span class="today-meal-day" style="color:var(--text3)">' + dayName + '</span>' +
-        '<span class="today-meal-name" style="color:var(--text3);font-weight:400;font-style:italic">Nothing planned</span>' +
+        '<span class="today-meal-name" style="color:var(--text3);font-weight:500">Nothing planned</span>' +
         '<button class="today-meal-btn" onclick="switchTab(\'recipes\');setTimeout(openMealPlanner,150)" style="color:var(--text3);font-size:11px">Plan →</button>' +
       '</div>';
   };
@@ -1995,7 +2016,7 @@ function renderTodayMealBanner() {
     var isFirst = rows.indexOf(row) === 0;
     var slotLabel = (r.mealType === 'Snack' || r.mealType === 'Dessert') ? 'Snack' : sd.label;
     return '<div style="display:flex;align-items:center;gap:10px;' + (isFirst ? '' : 'margin-top:10px;padding-top:10px;border-top:1px solid var(--border);') + '">' +
-      '<span style="font-family:monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);opacity:0.7;width:52px;flex-shrink:0">' + slotLabel + '</span>' +
+      '<span style="font-family:Figtree,sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);opacity:0.7;width:52px;flex-shrink:0">' + slotLabel + '</span>' +
       '<span class="today-meal-name" style="flex:1">' + safeLabel + '</span>' +
       (r ? '<button class="today-meal-btn" onclick="openRecipeDetail(' + r.id + ')" style="background:var(--surface2);color:var(--text2)">View</button>' +
       '<button class="today-meal-btn" onclick="openCookingMode(' + r.id + ')">🍳 Cook</button>' : '') +
@@ -2040,14 +2061,14 @@ function renderPantryValue(expiringCount) {
   var valueStr = '$' + estimated.toFixed(0);
 
   var expiryNote = expiringCount > 0
-    ? '<button onclick="scrollToSoonestExpiry()" style="background:rgba(196,98,45,0.12);border:1px solid rgba(196,98,45,0.35);border-radius:8px;padding:4px 8px;cursor:pointer;color:var(--accent2);font-size:10px;font-family:monospace;line-height:1.4;text-align:center;display:block">⚠ '+expiringCount+' expiring<br>soon</button>'
-    : '<div style="font-size:11px;color:var(--accent3);font-family:monospace;text-align:center;font-weight:600">All good!<br>✓</div>';
+    ? '<button onclick="scrollToSoonestExpiry()" style="background:rgba(196,98,45,0.12);border:1px solid rgba(196,98,45,0.35);border-radius:8px;padding:4px 8px;cursor:pointer;color:var(--accent2);font-size:10px;font-family:Figtree,sans-serif;line-height:1.4;text-align:center;display:block">⚠ '+expiringCount+' expiring<br>soon</button>'
+    : '<div style="font-size:11px;color:var(--accent3);font-family:Figtree,sans-serif;text-align:center;font-weight:600">All good!<br>✓</div>';
   banner.innerHTML =
     '<div class="pvb-left">'+
       '<div class="pvb-icon">🏪</div>'+
       '<div>'+
         '<div class="pvb-label">Estimated Pantry Value</div>'+
-        '<div class="pvb-value">'+valueStr+' <span style="font-size:13px;font-weight:400;font-family:\'DM Sans\',sans-serif;color:var(--text2)">across '+count+' items</span></div>'+
+        '<div class="pvb-value">'+valueStr+' <span style="font-size:13px;font-weight:400;font-family:Figtree,sans-serif;color:var(--text2)">across '+count+' items</span></div>'+
         '<div class="pvb-sub">You\'ve got food — eat it before buying more</div>'+
       '</div>'+
     '</div>'+
@@ -2216,7 +2237,7 @@ function renderContent() {
   });
   if (!filtered.length) {
     var qRaw = document.getElementById('searchInput').value.trim();
-    var addBtn = qRaw ? '<button onclick="quickAddFromSearch(\''+jsStr(qRaw)+'\')" style="margin-top:12px;padding:9px 20px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer">+ Add "'+escHtml(qRaw)+'" to pantry</button>' : '';
+    var addBtn = qRaw ? '<button onclick="quickAddFromSearch(\''+jsStr(qRaw)+'\')" style="margin-top:12px;padding:9px 20px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:Figtree,sans-serif;font-size:14px;font-weight:600;cursor:pointer">+ Add "'+escHtml(qRaw)+'" to pantry</button>' : '';
     document.getElementById('mainContent').innerHTML = '<div class="empty-state"><p>Nothing found for <strong style="color:var(--text)">'+escHtml(qRaw)+'</strong>.<br>'+addBtn+'</p></div>';
     return;
   }
@@ -2444,7 +2465,7 @@ function itemNameAutocomplete(input) {
   acSelectedIdx = -1;
   dropdown.innerHTML = matches.map(function(m, i){
     var badge = m.existing
-      ? '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(232,160,67,0.15);color:var(--accent);margin-left:4px;font-family:monospace;vertical-align:middle">in pantry</span>'
+      ? '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(232,160,67,0.15);color:var(--accent);margin-left:4px;font-family:Figtree,sans-serif;vertical-align:middle">in pantry</span>'
       : '';
     return '<div class="autocomplete-item" data-idx="'+i+'" data-name="'+escHtml(m.name)+'" data-loc="'+escHtml(m.loc)+'" onclick="acSelect(\''+jsStr(m.name)+'\',\''+jsStr(m.loc)+'\')">'+
       '<span class="autocomplete-item-name">'+escHtml(m.name)+badge+'</span>'+
@@ -2841,7 +2862,7 @@ function renderAutoSortPanel() {
       preview + more +
       '<button onclick="runAutoSort()" style="margin-top:11px;width:100%;padding:10px;' +
         'background:var(--accent);color:#000;border:0;border-radius:10px;font-weight:600;' +
-        'font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Re-sort these items</button>' +
+        'font-size:13px;cursor:pointer;font-family:Figtree,sans-serif">Re-sort these items</button>' +
     '</div>';
 }
 
@@ -2936,7 +2957,7 @@ function openCookedModal(id) {
       '<span class="cooked-ing-status '+(have?'have':'missing')+'">'+(have?'✓':'✗')+'</span>' +
       '<span class="cooked-ing-name">'+escHtml(ing.name)+'</span>' +
       (have
-        ? '<input class="cooked-ing-qty-input" type="text" value="'+escHtml(ing.qty||'')+'" data-ing-idx="'+r.ingredients.indexOf(ing)+'" style="width:72px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:12px;padding:3px 7px;text-align:right" />'
+        ? '<input class="cooked-ing-qty-input" type="text" value="'+escHtml(ing.qty||'')+'" data-ing-idx="'+r.ingredients.indexOf(ing)+'" style="width:72px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:Figtree,sans-serif;font-size:12px;padding:3px 7px;text-align:right" />'
         : '<span class="cooked-ing-qty">'+(ing.qty||'')+'</span>') +
       '</div>';
   });
@@ -3716,8 +3737,8 @@ function openRecipeDetail(id) {
     var have = matched && matched.stock!=='out';
     var onShopList = shopList.some(function(s){ return s.name.toLowerCase() === ing.name.toLowerCase(); });
     var addBtn = have ? '' :
-      '<button onclick="quickAddToInventory(\''+jsStr(ing.name)+'\')" style="margin-left:auto;padding:2px 7px;font-size:10px;border-radius:8px;border:1px solid rgba(232,160,67,0.4);background:rgba(232,160,67,0.1);color:var(--accent);cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">+inventory</button>' +
-      '<button onclick="quickAddToShop(\''+jsStr(ing.name)+'\',\''+jsStr(ing.qty)+'\')" style="padding:2px 7px;font-size:10px;border-radius:8px;border:1px solid '+(onShopList?'rgba(122,182,72,0.4)':'rgba(74,159,212,0.4)')+';background:'+(onShopList?'rgba(122,182,72,0.1)':'rgba(74,159,212,0.1)')+';color:'+(onShopList?'var(--accent3)':'#5dade2')+';cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">'+(onShopList?'✓ on list':'+list')+'</button>';
+      '<button onclick="quickAddToInventory(\''+jsStr(ing.name)+'\')" style="margin-left:auto;padding:2px 7px;font-size:10px;border-radius:8px;border:1px solid rgba(232,160,67,0.4);background:rgba(232,160,67,0.1);color:var(--accent);cursor:pointer;font-family:Figtree,sans-serif;white-space:nowrap">+inventory</button>' +
+      '<button onclick="quickAddToShop(\''+jsStr(ing.name)+'\',\''+jsStr(ing.qty)+'\')" style="padding:2px 7px;font-size:10px;border-radius:8px;border:1px solid '+(onShopList?'rgba(122,182,72,0.4)':'rgba(74,159,212,0.4)')+';background:'+(onShopList?'rgba(122,182,72,0.1)':'rgba(74,159,212,0.1)')+';color:'+(onShopList?'var(--accent3)':'#5dade2')+';cursor:pointer;font-family:Figtree,sans-serif;white-space:nowrap">'+(onShopList?'✓ on list':'+list')+'</button>';
     return '<div class="ingredient-row'+(have?' have':' missing')+'" style="display:flex;align-items:center;gap:6px">'+
       '<span class="ingredient-status'+(have?' have':' missing')+'">'+(have?'/':'!')+'</span>'+
       '<span class="ingredient-name">'+escHtml(ing.name)+'</span>'+
@@ -4857,7 +4878,7 @@ function showPersistentError(msg) {
     'position:fixed;bottom:80px;left:50%;transform:translateX(-50%)',
     'width:calc(100% - 32px);max-width:420px',
     'background:#c04040;color:#fff;border-radius:14px;padding:14px 16px',
-    'font-family:"DM Sans",sans-serif;font-size:13px;line-height:1.4',
+    'font-family:Figtree,sans-serif;font-size:13px;line-height:1.4',
     'z-index:9999;display:flex;align-items:flex-start;gap:10px',
     'box-shadow:0 8px 24px rgba(0,0,0,0.5)'
   ].join(';');
@@ -4906,7 +4927,7 @@ function showShareLinkModal(name, url) {
   copyBtn.id = 'shareCopyBtn';
   copyBtn.textContent = 'Copy Link';
   copyBtn.disabled = true;
-  copyBtn.style.cssText = 'padding:9px 14px;border-radius:10px;border:none;background:var(--text3);color:#000;font-weight:700;font-size:13px;font-family:\'DM Sans\',sans-serif;cursor:default;flex-shrink:0;white-space:nowrap;opacity:0.5';
+  copyBtn.style.cssText = 'padding:9px 14px;border-radius:10px;border:none;background:var(--text3);color:#000;font-weight:700;font-size:13px;font-family:Figtree,sans-serif;cursor:default;flex-shrink:0;white-space:nowrap;opacity:0.5';
   copyBtn.onclick = doShareCopy;
   bar.appendChild(copyBtn);
 
@@ -4915,14 +4936,14 @@ function showShareLinkModal(name, url) {
     shareBtn.id = 'shareNativeBtn';
     shareBtn.textContent = '↗';
     shareBtn.disabled = true;
-    shareBtn.style.cssText = 'padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:15px;font-family:\'DM Sans\',sans-serif;cursor:default;flex-shrink:0;opacity:0.5';
+    shareBtn.style.cssText = 'padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:15px;font-family:Figtree,sans-serif;cursor:default;flex-shrink:0;opacity:0.5';
     shareBtn.onclick = function(){ doShareNative(hidden.textContent, name); };
     bar.appendChild(shareBtn);
   }
 
   var closeBtn = document.createElement('button');
   closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:13px;font-family:\'DM Sans\',sans-serif;cursor:pointer;flex-shrink:0';
+  closeBtn.style.cssText = 'padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:13px;font-family:Figtree,sans-serif;cursor:pointer;flex-shrink:0';
   closeBtn.onclick = function(){ bar.remove(); };
   bar.appendChild(closeBtn);
 
@@ -5094,7 +5115,7 @@ function showShareImportBanner(type, name, onAccept) {
     'border-radius:16px;padding:14px 16px',
     'display:flex;align-items:center;gap:10px',
     'z-index:8000;box-shadow:0 8px 32px rgba(0,0,0,0.6)',
-    'font-family:"DM Sans",sans-serif;animation:slideIn 0.2s ease'
+    'font-family:Figtree,sans-serif;animation:slideIn 0.2s ease'
   ].join(';');
 
   var icon = type === 'cocktail' ? '🍸' : '🍳';
@@ -5106,8 +5127,8 @@ function showShareImportBanner(type, name, onAccept) {
       '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(name) + '</div>' +
       '<div style="font-size:11px;color:var(--text3);margin-top:1px">Shared ' + label + ' — add to your collection?</div>' +
     '</div>' +
-    '<button id="importAcceptBtn" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:#000;font-weight:700;font-size:13px;font-family:\'DM Sans\',sans-serif;cursor:pointer;flex-shrink:0">Add</button>' +
-    '<button onclick="hideImportBanner()" style="padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-family:\'DM Sans\',sans-serif;cursor:pointer;flex-shrink:0">✕</button>';
+    '<button id="importAcceptBtn" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:#000;font-weight:700;font-size:13px;font-family:Figtree,sans-serif;cursor:pointer;flex-shrink:0">Add</button>' +
+    '<button onclick="hideImportBanner()" style="padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-family:Figtree,sans-serif;cursor:pointer;flex-shrink:0">✕</button>';
 
   document.body.appendChild(banner);
   document.getElementById('importAcceptBtn').addEventListener('click', function() {
@@ -5187,7 +5208,7 @@ function handleRestoreFile(input) {
       status.style.border = '1px solid rgba(122,182,72,0.3)';
       status.style.color = 'var(--accent3)';
       status.innerHTML = '✓ Ready to restore: ' + counts.join(', ') +
-        '<br><button onclick="confirmRestore()" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent3);color:#0a1a0a;font-weight:700;font-family:\'DM Sans\',sans-serif;font-size:13px;cursor:pointer">Restore this backup</button>';
+        '<br><button onclick="confirmRestore()" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent3);color:#0a1a0a;font-weight:700;font-family:Figtree,sans-serif;font-size:13px;cursor:pointer">Restore this backup</button>';
       // Stash parsed data
       window._pendingRestore = d;
     } catch(err) {
@@ -5265,7 +5286,7 @@ window.showUpdateBanner = function (reg) {
   bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:78px;z-index:99998;' +
     'background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);' +
     'padding:14px 16px;display:flex;gap:12px;align-items:center;' +
-    'box-shadow:0 6px 24px rgba(0,0,0,0.5);font-family:\'DM Sans\',sans-serif;' +
+    'box-shadow:0 6px 24px rgba(0,0,0,0.5);font-family:Figtree,sans-serif;' +
     'animation:slideIn 0.25s ease';
   bar.innerHTML =
     '<div style="flex:1;font-size:13px;color:var(--text);line-height:1.4">' +
@@ -5467,7 +5488,7 @@ function showStorageWarning() {
     bar = document.createElement('div');
     bar.id = 'storageWarning';
     bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#c4622d;color:#fff;' +
-      'padding:12px 16px;font-family:\'DM Sans\',sans-serif;font-size:13px;line-height:1.4;' +
+      'padding:12px 16px;font-family:Figtree,sans-serif;font-size:13px;line-height:1.4;' +
       'box-shadow:0 -2px 12px rgba(0,0,0,0.4);display:flex;gap:12px;align-items:center';
     bar.innerHTML = '<div style="flex:1"><strong>Storage full — changes are not being saved.</strong><br>' +
       'Export a backup so nothing is lost, then reload the app.</div>' +
@@ -6161,11 +6182,11 @@ function cookingRender(r, skipScrollTo, noScroll) {
   }
 
   var servingsHtml = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:8px 12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">' +
-    '<span style="font-size:11px;color:var(--text3);font-family:monospace;text-transform:uppercase;letter-spacing:1px">Serves</span>' +
-    '<button style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--surface3);color:var(--text);font-size:16px;cursor:pointer;font-family:monospace;display:flex;align-items:center;justify-content:center" onclick="cookingScaleServings(-1)">−</button>' +
-    '<span style="font-family:monospace;font-size:17px;font-weight:700;color:var(--accent);min-width:28px;text-align:center">'+currentServes+'</span>' +
-    '<button style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--surface3);color:var(--text);font-size:16px;cursor:pointer;font-family:monospace;display:flex;align-items:center;justify-content:center" onclick="cookingScaleServings(1)">+</button>' +
-    (scale !== 1 ? '<span style="font-size:10px;color:var(--text3);font-family:monospace">(base: '+r.serves+')</span>' : '') +
+    '<span style="font-size:11px;color:var(--text3);font-family:Figtree,sans-serif;text-transform:uppercase;letter-spacing:1px">Serves</span>' +
+    '<button style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--surface3);color:var(--text);font-size:16px;cursor:pointer;font-family:Figtree,sans-serif;display:flex;align-items:center;justify-content:center" onclick="cookingScaleServings(-1)">−</button>' +
+    '<span style="font-family:Figtree,sans-serif;font-size:17px;font-weight:700;color:var(--accent);min-width:28px;text-align:center">'+currentServes+'</span>' +
+    '<button style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--surface3);color:var(--text);font-size:16px;cursor:pointer;font-family:Figtree,sans-serif;display:flex;align-items:center;justify-content:center" onclick="cookingScaleServings(1)">+</button>' +
+    (scale !== 1 ? '<span style="font-size:10px;color:var(--text3);font-family:Figtree,sans-serif">(base: '+r.serves+')</span>' : '') +
     '</div>';
 
   var ingHtml = r.ingredients.map(function(ing, i) {
@@ -6221,9 +6242,9 @@ function cookingRender(r, skipScrollTo, noScroll) {
     '</div>' +
     '<div class="cooking-body">' +
       servingsHtml +
-      '<div style="font-size:11px;color:var(--text3);font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Ingredients — tap to check off</div>' +
+      '<div style="font-size:11px;color:var(--text3);font-family:Figtree,sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Ingredients — tap to check off</div>' +
       '<div class="cooking-ing-grid">' + ingHtml + '</div>' +
-      '<div style="font-size:11px;color:var(--text3);font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Steps</div>' +
+      '<div style="font-size:11px;color:var(--text3);font-family:Figtree,sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Steps</div>' +
       stepsHtml +
     '</div>' +
     '<div class="cooking-nav">' + prevBtn + nextBtn + '</div>';
@@ -6526,7 +6547,7 @@ function mpRender() {
       var recipe = (!recipeId || isLeftover) ? null : recipes.find(function(r){ return r.id == recipeId; });
       var leftoverSource = isLeftover ? mpGetPrevDayRecipe(dayKey) : null;
 
-      html += '<div style="font-size:10px;font-family:monospace;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:8px 0 3px">' + slotLabel + '</div>';
+      html += '<div style="font-size:10px;font-family:Figtree,sans-serif;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:8px 0 3px">' + slotLabel + '</div>';
 
       if (isLeftover) {
         var srcPhoto = '<div class="mp-slot-photo-placeholder" style="font-size:16px">♻️</div>';
@@ -6718,13 +6739,13 @@ function mpPickerFilter() {
             '<div style="flex:1;min-width:0">' +
               '<div class="mp-picker-name">Leftovers</div>' +
               '<div class="mp-picker-meta">' + escHtml(opt.recipe.name) + '</div>' +
-              '<div style="font-size:10px;font-family:monospace;color:var(--accent3);margin-top:2px">♻️ ' + ageLabel + ' — no shopping needed</div>' +
+              '<div style="font-size:10px;font-family:Figtree,sans-serif;color:var(--accent3);margin-top:2px">♻️ ' + ageLabel + ' — no shopping needed</div>' +
             '</div>' +
           '</div>' +
           '<button onclick="event.stopPropagation();mpRemoveLeftoverSource(\'' + srcWk + '\',\'' + srcDk + '\',\'' + srcSl + '\')" title="Remove — finished" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:6px">&#x2715;</button>' +
         '</div>';
       });
-      html += '<div style="font-family:monospace;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin:10px 0 8px;display:flex;align-items:center;gap:8px">Or pick a recipe <span style="flex:1;height:1px;background:var(--border);display:inline-block"></span></div>';
+      html += '<div style="font-family:Figtree,sans-serif;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin:10px 0 8px;display:flex;align-items:center;gap:8px">Or pick a recipe <span style="flex:1;height:1px;background:var(--border);display:inline-block"></span></div>';
     }
   }
 
@@ -6749,7 +6770,7 @@ function mpPickerFilter() {
     var statusHtml = '';
     if (expiringCount > 0) {
       var expiryLabel = soonestExpiry === 0 ? 'expires today' : 'exp in ' + soonestExpiry + 'd';
-      statusHtml = '<div style="font-size:10px;font-family:monospace;color:var(--accent2);margin-top:2px">⚠ ' + expiringCount + ' ingredient' + (expiringCount>1?'s':'')+' expiring (' + expiryLabel + ')</div>';
+      statusHtml = '<div style="font-size:10px;font-family:Figtree,sans-serif;color:var(--accent2);margin-top:2px">⚠ ' + expiringCount + ' ingredient' + (expiringCount>1?'s':'')+' expiring (' + expiryLabel + ')</div>';
     } else if (canMake) {
       statusHtml = '<div class="mp-picker-ok">✓ Can make now</div>';
     } else {
