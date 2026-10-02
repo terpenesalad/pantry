@@ -1,0 +1,211 @@
+name: Build Android APK
+
+# Builds an installable APK and attaches it to a GitHub Release.
+#
+#  - Push a tag like v1.0.3  -> a release for that version
+#  - Push to main            -> updates the rolling "latest" pre-release
+#  - Run manually            -> same as a push to main
+#
+# Signing: add the four secrets listed in README under "Signing" and every
+# build is signed with your own key, so Android will install updates over the
+# top of an existing install. Without them the job still produces a debug APK
+# you can sideload, but its signature changes each run, so you would have to
+# uninstall before reinstalling.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          # Capacitor 8 recommends JDK 21.
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Work out version
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            NAME="${GITHUB_REF#refs/tags/v}"
+            TAG="${GITHUB_REF#refs/tags/}"
+            PRERELEASE=false
+          else
+            NAME="0.0.0-dev.${GITHUB_RUN_NUMBER}"
+            TAG="latest"
+            PRERELEASE=true
+          fi
+          echo "name=${NAME}"            >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}"              >> "$GITHUB_OUTPUT"
+          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
+          # versionCode must increase on every build Android ever sees.
+          echo "code=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "Building ${NAME} (versionCode ${GITHUB_RUN_NUMBER}) -> tag ${TAG}"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Sanity-check the web app
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html || { echo "index.html is missing"; exit 1; }
+          # Fail fast on a broken build rather than shipping an APK that
+          # white-screens on launch.
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const src = readFileSync("index.html", "utf8");
+            const blocks = [...src.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)];
+            if (!blocks.length) { console.error("no inline script found"); process.exit(1); }
+            for (const [i, m] of blocks.entries()) {
+              try { new Function(m[1]); }
+              catch (e) { console.error(`script block ${i} failed to parse: ${e.message}`); process.exit(1); }
+            }
+            console.log(`index.html OK — ${blocks.length} script block(s), ${(src.length/1024).toFixed(1)} KB`);
+          '
+
+      - name: Stage web assets
+        run: npm run prepare:www
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Install icon tooling
+        run: python3 -m pip install --quiet --break-system-packages Pillow
+
+      - name: Apply the app icon
+        run: node scripts/android-icons.mjs
+
+      - name: Apply version to the Android project
+        shell: bash
+        run: |
+          set -euo pipefail
+          GRADLE=android/app/build.gradle
+          sed -i "s/versionCode [0-9]\+/versionCode ${{ steps.ver.outputs.code }}/" "$GRADLE"
+          sed -i "s/versionName \"[^\"]*\"/versionName \"${{ steps.ver.outputs.name }}\"/" "$GRADLE"
+          grep -nE 'versionCode|versionName' "$GRADLE"
+
+      # A step-level `env:` is not visible to that step's own `if:`, so the
+      # presence check happens inside the script and reports via an output.
+      - name: Decode signing keystore
+        id: signing
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${KEYSTORE_B64:-}" ]]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No ANDROID_KEYSTORE_BASE64 secret set."
+            exit 0
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > android/app/release.keystore
+          if [[ ! -s android/app/release.keystore ]]; then
+            echo "The keystore secret did not decode to a usable file." >&2
+            exit 1
+          fi
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "Keystore decoded ($(stat -c%s android/app/release.keystore) bytes)"
+
+      - name: Build signed release APK
+        if: ${{ steps.signing.outputs.available == 'true' }}
+        env:
+          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        working-directory: android
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon assembleRelease \
+            -Pandroid.injected.signing.store.file="$PWD/app/release.keystore" \
+            -Pandroid.injected.signing.store.password="$KS_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+
+      - name: Build debug APK (no signing secrets configured)
+        if: ${{ steps.signing.outputs.available != 'true' }}
+        shell: bash
+        working-directory: android
+        run: |
+          set -euo pipefail
+          echo "::warning title=Unsigned build::No signing secrets found, building a debug APK. Its signature changes every run, so you must uninstall before reinstalling. See README > Signing."
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Collect the APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          APK="$(find android/app/build/outputs/apk -name '*.apk' -type f | head -n1)"
+          if [[ -z "$APK" ]]; then echo "No APK was produced"; exit 1; fi
+          OUT="dist/pantry-${{ steps.ver.outputs.name }}.apk"
+          cp "$APK" "$OUT"
+          echo "path=${OUT}" >> "$GITHUB_OUTPUT"
+          echo "size=$(( $(stat -c%s "$OUT") / 1024 )) KB" >> "$GITHUB_OUTPUT"
+          ls -la dist/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pantry-apk
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error
+
+      - name: Move the rolling tag
+        if: ${{ steps.ver.outputs.tag == 'latest' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git tag -f latest
+          git push -f origin latest
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: >-
+            ${{ steps.ver.outputs.tag == 'latest'
+                && 'Latest build' || format('Pantry {0}', steps.ver.outputs.name) }}
+          prerelease: ${{ steps.ver.outputs.prerelease }}
+          files: ${{ steps.apk.outputs.path }}
+          body: |
+            **Pantry ${{ steps.ver.outputs.name }}** · versionCode ${{ steps.ver.outputs.code }} · ${{ steps.apk.outputs.size }}
+
+            Download the `.apk` below and open it on your phone to install.
+            Android will ask you to allow installing from this source the first time.
+
+            Signed build: `${{ steps.signing.outputs.available == 'true' && 'yes — installs as an update' || 'no — uninstall the old copy first' }}`
+
+            Commit: ${{ github.sha }}

@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.terpenesalad.pantry",
+  "appName": "Pantry",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

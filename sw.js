@@ -1,15 +1,14 @@
 /* Pantry — service worker
  *
- * The previous version cached index.html once at install and never refreshed
- * it, so an offline or flaky-network load could serve a build from months ago.
- * The cache name was also a constant, so the stale copy was never evicted.
- * This version revalidates on every successful load and tells the page when a
- * newer build is ready.
+ * The original cached index.html once at install and never refreshed it, with
+ * a constant cache name, so a stale build could be served indefinitely and was
+ * never evicted. This version revalidates on every successful load and tells
+ * the page when a newer build is ready.
  *
- * Bump VERSION whenever you want to guarantee a clean cache.
+ * Bump VERSION to force a clean cache.
  */
 
-var VERSION = 'v5';
+var VERSION = 'v6';
 var SHELL   = 'pantry-shell-' + VERSION;
 var RUNTIME = 'pantry-runtime-' + VERSION;
 
@@ -24,8 +23,8 @@ var SHELL_URLS = [
 self.addEventListener('install', function (e) {
   e.waitUntil(
     caches.open(SHELL).then(function (cache) {
-      // addAll rejects wholesale if any single file 404s, which would leave
-      // the worker installed with an empty cache. Fetch each independently.
+      // addAll rejects wholesale if any single file 404s, which would leave the
+      // worker installed with an empty cache. Fetch each independently.
       return Promise.all(SHELL_URLS.map(function (url) {
         return cache.add(url).catch(function () { /* optional asset */ });
       }));
@@ -51,7 +50,6 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-// Lets the page activate a waiting worker on demand.
 self.addEventListener('message', function (e) {
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -68,7 +66,7 @@ self.addEventListener('fetch', function (e) {
   var url;
   try { url = new URL(req.url); } catch (err) { return; }
 
-  // Leave Firebase, map tiles and audio streams entirely alone.
+  // Leave Firebase and other cross-origin traffic entirely alone.
   if (url.origin !== self.location.origin) return;
 
   // HTML: network first, but always refresh the cached copy on success so the
